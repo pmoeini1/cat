@@ -34,11 +34,11 @@ const Login = () => {
       <h2>Login</h2>
       <h3>{message}</h3>
       <Form>
-        <Form.Group controlId="formUsername">
-          <Form.Label>Username</Form.Label>
+        <Form.Group controlId="formEmail">
+          <Form.Label>Email</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter username"
+            placeholder="Enter email"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
           />
