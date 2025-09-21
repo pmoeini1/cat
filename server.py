@@ -3,6 +3,7 @@ from pymongo import MongoClient
 from flask_cors import CORS
 import logging
 from bson.objectid import ObjectId
+import imghdr
 
 
 app = Flask(__name__)
@@ -34,12 +35,28 @@ def login():
 @app.route('/addCat', methods=['POST'])
 def add_cat():
     data = request.json
+    if 'file' not in request.files:
+        return jsonify({"error": "No file part"}), 400
+    file = request.files['file']
+
+    if file.filename == '':
+        return jsonify({"error": "No selected file"}), 400
+
+    # Read file content
+    image_data = file.read()
+
+    # Validate it's an image
+    if not imghdr.what(None, h=image_data):
+        return jsonify({"error": "Uploaded file is not a valid image"}), 400
+
+
     try:
         nameString = data['name']
         ageNumber = data['age']
         breedString = data['breed']
         comments = data['comments']
-        db['cats'].insert_one({ 'name': nameString, 'age': ageNumber, 'breed': breedString, 'comments': comments })
+        db['cats'].insert_one({ 'name': nameString, 'age': ageNumber, 'breed': breedString, "filename": file.filename,
+ 'comments': comments })
         return jsonify(message='Cat added'), 200
     except Exception as e:
         logging.error(f"Error adding cat: {e}")
