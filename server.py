@@ -55,8 +55,9 @@ def add_cat():
         ageNumber = data['age']
         breedString = data['breed']
         comments = data['comments']
+        author = data['author']
         db['cats'].insert_one({ 'name': nameString, 'age': ageNumber, 'breed': breedString, "filename": file.filename,
- 'comments': comments })
+ 'comments': comments, author: author, })
         return jsonify(message='Cat added'), 200
     except Exception as e:
         logging.error(f"Error adding cat: {e}")
