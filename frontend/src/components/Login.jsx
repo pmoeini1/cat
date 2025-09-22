@@ -19,7 +19,7 @@ const Login = () => {
         console.log(response.data);
         // Handle successful login here
         setMessage('Login successful!');
-        //navigate('/dashboard'); // TODO: Redirect to main page
+        navigate('/viewcats'); 
       })
       .catch(error => {
         console.error('There was an error logging in!', error);

@@ -4,6 +4,9 @@ from flask_cors import CORS
 import logging
 from bson.objectid import ObjectId
 import imghdr
+from bson import Binary
+import base64
+
 
 
 app = Flask(__name__)
@@ -56,8 +59,10 @@ def add_cat():
         breedString = data['breed']
         comments = data['comments']
         author = data['author']
+        image_data = Binary(file.read())
         db['cats'].insert_one({ 'name': nameString, 'age': ageNumber, 'breed': breedString, "filename": file.filename,
- 'comments': comments, author: author, })
+            'comments': comments, 'author': author, 'image': image_data, 'mime_type': file.content_type
+        })
         return jsonify(message='Cat added'), 200
     except Exception as e:
         logging.error(f"Error adding cat: {e}")
@@ -80,6 +85,9 @@ def get_all_cats():
         cats = list(db['cats'].find())
         for cat in cats:
             cat['_id'] = str(cat['_id'])  # Convert ObjectId to string for JSON serialization
+            if 'image_data' in cat:
+                cat['image_base64'] = base64.b64encode(cat['image_data']).decode('utf-8')
+
         return jsonify(cats), 200
     except Exception as e:
         logging.error(f"Error retrieving cats: {e}")
