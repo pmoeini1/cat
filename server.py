@@ -7,7 +7,7 @@ import imghdr
 
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://localhost:4200"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 logging.basicConfig(level=logging.DEBUG)
 
 client = MongoClient('mongodb://localhost:27017/')
@@ -30,7 +30,7 @@ def login():
                 return jsonify(message="Successful login"), 200
     except Exception as e:
         logging.error(f"Error during login: {e}")
-        return jsonify(message='Error during login'), 500
+        return jsonify(message=f'Error during login'), 500
 
 @app.route('/addCat', methods=['POST'])
 def add_cat():
@@ -84,3 +84,6 @@ def get_all_cats():
     except Exception as e:
         logging.error(f"Error retrieving cats: {e}")
         return jsonify(message='Error retrieving cats'), 500
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
