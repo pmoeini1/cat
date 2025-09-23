@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-
+import { UserContext } from '../UserContext';
  
 
 const Login = () => {
@@ -10,6 +10,7 @@ const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [message, setMessage] = useState('');
+  const { email, setEmail } = useContext(UserContext);
 
 
   const submit = (e) => {
@@ -19,6 +20,7 @@ const Login = () => {
         console.log(response.data);
         // Handle successful login here
         setMessage('Login successful!');
+        setEmail(username);
         navigate('/viewcats'); 
       })
       .catch(error => {

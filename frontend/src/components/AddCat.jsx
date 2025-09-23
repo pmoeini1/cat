@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from 'axios';
 import { Button } from "react-bootstrap";
+import { UserContext } from './UserContext';
 
 const AddCat = () => {
+    const { email, setEmail } = useContext(UserContext);
     const [formData, setFormData] = useState({
         name: '',
         age: '',
@@ -18,6 +20,7 @@ const AddCat = () => {
         data.append('breed', formData.breed);
         data.append('comments', formData.comments);
         data.append('file', formData.file);
+        data.append('author', email);
 
         axios.post('http://localhost:5000/addCat', data)
             .then(response => {
