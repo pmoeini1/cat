@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { Form, Button, Container, Alert } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+
 
 
 const ViewCats = () => {
@@ -49,8 +52,10 @@ const ViewCats = () => {
                             });
                     }}>Delete</button>
                     <hr />
+                    
                 </div>
             ))}
+            <Link to="/addcat"><Button variant='secondary'>Add New Cat</Button></Link>
         </div>
     );
 }
