@@ -1,10 +1,15 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from 'axios';
 import { Button } from "react-bootstrap";
 import { UserContext } from '../UserContext';
 
 const AddCat = () => {
     const { email, setEmail } = useContext(UserContext);
+    useEffect(() => {
+        if (!email) {
+            window.location.href = '/';
+        }
+    }, [email]);
     const [formData, setFormData] = useState({
         name: '',
         age: '',

@@ -87,16 +87,18 @@ def add_cat():
         logging.error(f"Error adding cat: {e}")
         return jsonify(message='Error adding cat'), 500
 
-@app.route('/deleteCat', methods=['DELETE'])
-def delete_cat():
-    data = request.json
+@app.route('/deleteCat/<id>', methods=['DELETE', 'OPTIONS'])
+def delete_cat(id):
+    if request.method == 'OPTIONS':
+        return '', 200  # Respond to preflight request
+
     try:
-        id = data['id']
         db['cats'].delete_one({ '_id': ObjectId(id) })
         return jsonify(message='Cat deleted'), 200
     except Exception as e:
         logging.error(f"Error deleting cat: {e}")
         return jsonify(message='Error deleting cat'), 500
+
 
 @app.route('/getAllCats', methods=['GET'])
 def get_all_cats():

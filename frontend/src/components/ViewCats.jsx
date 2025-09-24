@@ -1,13 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Form, Button, Container, Alert } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-
-
+import { UserContext } from '../UserContext';
+import { useNavigate } from 'react-router-dom';
 
 const ViewCats = () => {
+    const { email, setEmail } = useContext(UserContext);
     const [cats, setCats] = useState([]);
     const [message, setMessage] = useState('');
+
+    useEffect(() => {
+        if (!email) {
+            window.location.href = '/';
+        }
+    }, [email]);
 
     const fetchCats = () => {
         axios.get('http://localhost:5000/getAllCats')
