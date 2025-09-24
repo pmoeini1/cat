@@ -6,6 +6,9 @@ from bson.objectid import ObjectId
 import imghdr
 from bson import Binary
 import base64
+from werkzeug.utils import secure_filename
+import os
+import gridfs
 
 
 
@@ -15,6 +18,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 client = MongoClient('mongodb://localhost:27017/')
 db = client['cat']
+fs = gridfs.GridFS(db)  
 
 @app.route('/login', methods=['POST'])
 def login():
@@ -37,33 +41,48 @@ def login():
 
 @app.route('/addCat', methods=['POST'])
 def add_cat():
-    data = request.json
-    if 'file' not in request.files:
-        return jsonify({"error": "No file part"}), 400
-    file = request.files['file']
-
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-
-    # Read file content
-    image_data = file.read()
-
-    # Validate it's an image
-    if not imghdr.what(None, h=image_data):
-        return jsonify({"error": "Uploaded file is not a valid image"}), 400
-
-
     try:
-        nameString = data['name']
-        ageNumber = data['age']
-        breedString = data['breed']
-        comments = data['comments']
-        author = data['author']
-        image_data = Binary(file.read())
-        db['cats'].insert_one({ 'name': nameString, 'age': ageNumber, 'breed': breedString, "filename": file.filename,
-            'comments': comments, 'author': author, 'image': image_data, 'mime_type': file.content_type
+        # Check if file is present
+        if 'file' not in request.files:
+            return jsonify({"error": "No file part"}), 400
+
+        file = request.files['file']
+
+        if file.filename == '':
+            return jsonify({"error": "No selected file"}), 400
+
+        # Read file content for validation
+        image_data = file.read()
+
+        # Validate it's an image
+        if not imghdr.what(None, h=image_data):
+            return jsonify({"error": "Uploaded file is not a valid image"}), 400
+
+        # Rewind the file stream so GridFS can read it again
+        file.stream.seek(0)
+
+        # Extract form fields
+        name = request.form.get('name')
+        age = request.form.get('age')
+        breed = request.form.get('breed')
+        comments = request.form.get('comments')
+        author = request.form.get('author')
+
+        # Store image in GridFS
+        image_id = fs.put(file, filename=file.filename, content_type=file.content_type)
+
+        # Insert cat document into MongoDB
+        db.cats.insert_one({
+            'name': name,
+            'age': age,
+            'breed': breed,
+            'comments': comments,
+            'author': author,
+            'image_id': image_id
         })
-        return jsonify(message='Cat added'), 200
+
+        return jsonify(message='Cat added successfully'), 200
+
     except Exception as e:
         logging.error(f"Error adding cat: {e}")
         return jsonify(message='Error adding cat'), 500
@@ -82,16 +101,31 @@ def delete_cat():
 @app.route('/getAllCats', methods=['GET'])
 def get_all_cats():
     try:
-        cats = list(db['cats'].find())
-        for cat in cats:
-            cat['_id'] = str(cat['_id'])  # Convert ObjectId to string for JSON serialization
-            if 'image_data' in cat:
-                cat['image_base64'] = base64.b64encode(cat['image_data']).decode('utf-8')
+        cats = []
+        for cat in db['cats'].find():
+            image_file = fs.get(cat['image_id'])  # Retrieve image from GridFS
+            image_data = image_file.read()
+            image_base64 = base64.b64encode(image_data).decode('utf-8')
 
-        return jsonify(cats), 200
+            cats.append({
+                '_id': str(cat['_id']),
+                'name': cat['name'],
+                'age': cat['age'],
+                'breed': cat['breed'],
+                'comments': cat['comments'],
+                'author': cat['author'],
+                'image_base64': image_base64,
+                'mime_type': image_file.content_type
+            })
+            print("Image MIME:", image_file.content_type)
+            print("Image size:", len(image_data))
+
+
+        return jsonify({'cats': cats}), 200
     except Exception as e:
         logging.error(f"Error retrieving cats: {e}")
         return jsonify(message='Error retrieving cats'), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

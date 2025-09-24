@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import axios from 'axios';
 import { Button } from "react-bootstrap";
-import { UserContext } from './UserContext';
+import { UserContext } from '../UserContext';
 
 const AddCat = () => {
     const { email, setEmail } = useContext(UserContext);
@@ -21,17 +21,21 @@ const AddCat = () => {
         data.append('comments', formData.comments);
         data.append('file', formData.file);
         data.append('author', email);
+        for (let [key, value] of data.entries()) {
+            console.log(`${key}:`, value);
+        }
 
-        axios.post('http://localhost:5000/addCat', data)
-            .then(response => {
+
+        axios.post('http://localhost:5000/addCat', data, { headers: { 'Content-Type': 'multipart/form-data' } })
+        .then(response => {
             console.log(response.data);
             alert('Cat added successfully!');
             event.target.reset();
-            })
-            .catch(error => {
+        })
+        .catch(error => {
             console.error('Error adding cat:', error);
             alert('Error adding cat. Please try again.');
-            });
+        });
     };
     return (
         <div>
@@ -93,6 +97,7 @@ const AddCat = () => {
                     required
                     />
                 </label>
+                <br />
                 {formData.file && (
                     <img
                         src={URL.createObjectURL(formData.file)}
@@ -102,6 +107,8 @@ const AddCat = () => {
                 )}
                 <br />
                 <Button variant="success" type="submit">Add Cat</Button>
+                <br /><br />
+                <Button variant="secondary" href="/viewcats">Back to View Cats</Button>
             </form>
         </div>
     );

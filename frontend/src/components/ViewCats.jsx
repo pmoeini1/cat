@@ -11,17 +11,15 @@ const ViewCats = () => {
 
     const fetchCats = () => {
         axios.get('http://localhost:5000/getAllCats')
-            .then(response => response.json())
-            .then(data => {
-                setCats(data.cats);
-                setMessage('Cats fetched successfully!');
-            }
-            )
+            .then(response => {
+            setCats(response.data.cats); // assuming your backend returns { cats: [...] }
+            setMessage('Cats fetched successfully!');
+            })
             .catch(error => {
-                console.error('Error fetching cats:', error);
-                setMessage('Error fetching cats');
+            console.error('Error fetching cats:', error);
+            setMessage('Error fetching cats');
             });
-    }
+    };
     useEffect(() => {
         fetchCats();
     }, []);
