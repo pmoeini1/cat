@@ -6,6 +6,7 @@ import ViewCats from './components/ViewCats';
 import AddCat from './components/AddCat';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { UserProvider } from './UserContext';
+import './tailwind.css';
 
 
 function App() {
