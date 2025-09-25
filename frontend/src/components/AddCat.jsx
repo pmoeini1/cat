@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import axios from 'axios';
-import { Button } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 import { UserContext } from '../UserContext';
 
 const AddCat = () => {
@@ -43,57 +43,53 @@ const AddCat = () => {
         });
     };
     return (
-        <div>
+        <div className="flex flex-col items-center min-h-screen bg-gray-50 px-4">
             <h2>Add a New Cat</h2>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label>
-                        Name:
-                        <input
+            <Form onSubmit={handleSubmit} className="space-y-4">
+                <Form.Group controlId="formName" className="mb-3">
+                    <Form.Label className="text-sm font-medium text-gray-700">Name</Form.Label>
+                        <Form.Control
                             type="text"
                             name="name"
+                            placeholder="Enter cat's name"
                             value={formData.name}
                             onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             required
                         />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Age:
-                        <input
+                </Form.Group>
+                <Form.Group controlId="formAge" className="mb-3">
+                    <Form.Label className="text-sm font-medium text-gray-700">Age</Form.Label>
+                        <Form.Control
+                            placeholder="Enter cat's age"
                             type="number"
                             name="age"
                             value={formData.age}
                             onChange={(e) => setFormData({ ...formData, age: e.target.value })}
                             required
                         />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Breed:
-                        <input
+                </Form.Group>
+                <Form.Group controlId="formBreed" className="mb-3">
+                    <Form.Label className="text-sm font-medium text-gray-700">Breed</Form.Label>
+                        <Form.Control
+                            placeholder="Enter cat's breed"
                             type="text"
                             name="breed"
                             value={formData.breed}
                             onChange={(e) => setFormData({ ...formData, breed: e.target.value })}
                             required
                         />
-                    </label>
-                </div>
-                <div>
-                    <label>
-                        Comments:
+                </Form.Group>
+                <Form.Group controlId="formComments" className="mb-3">
+                    <Form.Label className="text-sm font-medium text-gray-700">Comments:</Form.Label>  
+                        <br />
                         <textarea
                             name="comments"
                             value={formData.comments}
                             onChange={(e) => setFormData({ ...formData, comments: e.target.value })}
                         />
-                    </label>
-                </div>
-                <label>
-                    Image:
+                </Form.Group>
+                <Form.Label className="text-sm font-medium text-gray-700">Upload Image:</Form.Label>
+                <br />
                     <input
                     type="file"
                     name="file"
@@ -101,7 +97,6 @@ const AddCat = () => {
                     onChange={(e) => setFormData({ ...formData, file: e.target.files[0] })}
                     required
                     />
-                </label>
                 <br />
                 {formData.file && (
                     <img
@@ -114,7 +109,7 @@ const AddCat = () => {
                 <Button variant="success" type="submit">Add Cat</Button>
                 <br /><br />
                 <Button variant="secondary" href="/viewcats">Back to View Cats</Button>
-            </form>
+            </Form>
         </div>
     );
 }
